@@ -151,18 +151,6 @@ data.CtF.ready <- make_Ct_ready(data = data.CtF,
 # Missing values were imputed:
 as.data.frame(data.CtF.ready)[19:25,]
 
-## ----cache=FALSE--------------------------------------------------------------
-data.Ct.exp <- exp_Ct_dCt(data = data.CtF.ready)
-library(coin)
-RQ.Ct.exp <- RQ_exp_Ct_dCt(data = data.Ct.exp,
-                           do.tests = TRUE,
-                           pairwise = FALSE,
-                           group.study = "Disease",
-                           group.ref = "Control")
-
-# Obtained table can be sorted by, e.g. p values from the Mann-Whitney U test:
-head(as.data.frame(arrange(RQ.Ct.exp, MW_test_p)))
-
 ## ----fig.dim=c(7.1,4), cache=FALSE--------------------------------------------
 library(ctrlGene)
 # Remember that the number of colors in col parameter should be equal to the number of tested genes:
@@ -177,29 +165,18 @@ ref <- find_ref_gene(data = data.CtF.ready,
 ref[[2]]
 
 ## ----cache=FALSE--------------------------------------------------------------
-data.dCt <- delta_Ct(data = data.CtF.ready,
-                     ref = "Gene8")
-data.dCt.exp <- exp_Ct_dCt(data = data.dCt)
-library(coin)
-RQ.dCt.exp <- RQ_exp_Ct_dCt(data = data.dCt.exp,
-                            do.tests = TRUE,
-                            group.study = "Disease",
-                            group.ref = "Control")
-
-# Obtained table can be sorted by, e.g. p values from the Mann-Whitney U test:
-head(as.data.frame(arrange(RQ.dCt.exp, MW_test_p)))
+# For 2^-dCt^ method:
+data.dCt.exp <- delta_Ct(data = data.CtF.ready,
+                     normalise = TRUE,
+                     ref = "Gene8",
+                     transform = TRUE)
 
 ## ----cache=FALSE--------------------------------------------------------------
+# For 2^-ddCt^ method:
 data.dCt <- delta_Ct(data = data.CtF.ready,
-                     ref = "Gene8")
-library(coin)
-RQ.ddCt <- RQ_ddCt(data = data.dCt,
-                   group.study = "Disease",
-                   group.ref = "Control",
-                   do.tests = TRUE)
-
-# Obtained table can be sorted by, e.g. p values from the Mann-Whitney U test:
-head(as.data.frame(arrange(RQ.ddCt, MW_test_p)))
+                     normalise = TRUE,
+                     ref = "Gene8",
+                     transform = FALSE)
 
 ## ----fig.dim=c(7.1,6), cache=FALSE--------------------------------------------
 control_boxplot_sample <- control_boxplot_sample(data = data.dCt,
@@ -233,13 +210,39 @@ control.pca.gene <- control_pca_gene(data = data.dCt)
 data.dCtF <- filter_transformed_data(data = data.dCt,
                                      remove.Sample = c("Control11"))
 
+## ----cache=FALSE--------------------------------------------------------------
+data.dCt.exp <- delta_Ct(data = data.CtF.ready,
+                         ref = "Gene8",
+                         transform = TRUE)
+library(coin)
+results.dCt <- RQ_dCt(data = data.dCt.exp,
+                            do.tests = TRUE,
+                            group.study = "Disease",
+                            group.ref = "Control")
+
+# Obtained table can be sorted by, e.g. p values from the Mann-Whitney U test:
+head(as.data.frame(arrange(results.dCt, MW_test_p)))
+
+## ----cache=FALSE--------------------------------------------------------------
+data.dCt <- delta_Ct(data = data.CtF.ready,
+                     ref = "Gene8",
+                     transform = FALSE)
+library(coin)
+results.ddCt <- RQ_ddCt(data = data.dCt,
+                   group.study = "Disease",
+                   group.ref = "Control",
+                   do.tests = TRUE)
+
+# Obtained table can be sorted by, e.g. p values from the Mann-Whitney U test:
+head(as.data.frame(arrange(results.ddCt, MW_test_p)))
+
 ## ----fig.dim=c(7.1,4), cache=FALSE--------------------------------------------
 # Variant with p values depending on the normality of the data:
 library(ggsignif)
 # Specifying vector with significance labels: 
 signif.labels <- c("****","**","ns."," ns. ","  ns.  ","   ns.   ","    ns.    ","     ns.     ","      ns.      ","       ns.       ","        ns.        ","         ns.         ","          ns.          ","***")
 # Genes with p < 0.05 and 2-fold changed expression between compared groups are considered significant: 
-RQ.plot <- RQ_plot(data = RQ.ddCt,
+FCh.plot <- FCh_plot(data = results.ddCt,
                    use.p = TRUE,
                    mode = "depends",
                    p.threshold = 0.05,
@@ -249,7 +252,7 @@ RQ.plot <- RQ_plot(data = RQ.ddCt,
                    signif.labels = signif.labels,
                    angle = 20)
 # Access the table with results:
-head(as.data.frame(RQ.plot[[2]]))
+head(as.data.frame(FCh.plot[[2]]))
 
 ## ----fig.dim=c(7.1,4), cache=FALSE--------------------------------------------
 user <- data.dCt %>%
@@ -261,7 +264,7 @@ user <- data.dCt %>%
                     .groups = "keep")
 # The stats::wilcox.test() functions is limited to cases without ties; therefore, a warning "cannot compute exact p-value with ties" will appear when ties occur.
 
-RQ.plot <- RQ_plot(data = RQ.ddCt,
+FCh.plot <- FCh_plot(data = results.ddCt,
                    use.p = TRUE,
                    mode = "user",
                    p.threshold = 0.05,
@@ -271,16 +274,16 @@ RQ.plot <- RQ_plot(data = RQ.ddCt,
                    signif.labels = signif.labels,
                    angle = 30)
 # Access the table with results:
-head(as.data.frame(RQ.plot[[2]]))
+head(as.data.frame(FCh.plot[[2]]))
 
 ## ----fig.dim=c(5,5.5), fig.align='center', cache=FALSE------------------------
 # Genes with p < 0.05 and 2-fold changed expression between compared groups are considered significant: 
-RQ.volcano <- RQ_volcano(data = RQ.ddCt,
+volcano <- results_volcano(data = results.ddCt,
                          mode = "depends",
                          p.threshold = 0.05,
                          FCh.threshold = 2)
 # Access the table with results:
-head(as.data.frame(RQ.volcano[[2]]))
+head(as.data.frame(volcano[[2]]))
 
 ## ----fig.dim=c(5,4.5), fig.align='center', cache=FALSE------------------------
 final_boxplot <- results_boxplot(data = data.dCtF,
@@ -342,7 +345,7 @@ pca.kmeans[[1]] + theme(legend.box = "vertical")
 library(Hmisc)
 library(corrplot)
 # To make the plot more readable, only part of the data was used:
-corr.samples <- corr_sample(data = data.dCtF[15:30, ],
+corr.samples <- corr_sample(data = data.dCt[15:30, ],
                             method = "pearson",
                             order = "hclust",
                             size = 0.7,
@@ -478,23 +481,6 @@ data.Ct.pairwiseF.ready <- make_Ct_ready(data = data.Ct.pairwiseF,
 # Missing values were imputed:
 as.data.frame(data.Ct.pairwiseF.ready)[9:19,10:15]
 
-## ----cache=FALSE--------------------------------------------------------------
-data.Ct.exp.pairwise <- exp_Ct_dCt(data = data.Ct.pairwiseF.ready)
-library(coin)
-# Remember to set pairwise to TRUE:
-RQ.Ct.exp.pairwise <- RQ_exp_Ct_dCt(data = data.Ct.exp.pairwise,
-                           do.tests = TRUE,
-                           pairwise = TRUE,
-                           group.study = "After",
-                           group.ref = "Before")
-
-# Obtained table can be sorted by, e.g. p values from the Mann-Whitney U test:
-results <- as.data.frame(arrange(RQ.Ct.exp.pairwise[[1]], MW_test_p))
-head(results)
-# Access to the table with fold change values calculated individually for each pair of sampleS:
-FCh <- RQ.Ct.exp.pairwise[[2]]
-head(FCh)
-
 ## ----fig.dim=c(7.1,4), cache=FALSE--------------------------------------------
 library(ctrlGene)
 # Remember that the number of colors in col parameter should be equal to the number of tested genes:
@@ -509,37 +495,44 @@ ref.pairwise <- find_ref_gene(data = data.Ct.pairwiseF.ready,
 ref.pairwise[[2]]
 
 ## ----cache=FALSE--------------------------------------------------------------
-data.dCt.pairwise <- delta_Ct(data = data.Ct.pairwiseF.ready, ref = "Gene4")
-data.dCt.exp.pairwise <- exp_Ct_dCt(data = data.dCt.pairwise)
+data.dCt.pairwise <- delta_Ct(data = data.Ct.pairwiseF.ready, ref = "Gene4", transform = FALSE)
+
+## ----cache=FALSE--------------------------------------------------------------
+data.dCt.exp.pairwise <- delta_Ct(data = data.Ct.pairwiseF.ready,
+                     ref = "Gene4",
+                     transform = TRUE)
+
+## ----cache=FALSE--------------------------------------------------------------
+data.dCt.pairwise <- delta_Ct(data = data.Ct.pairwiseF.ready, ref = "Gene4", transform = FALSE)
 library(coin)
-RQ.dCt.exp.pairwise <- RQ_exp_Ct_dCt(data = data.dCt.exp.pairwise,
-                            do.tests = TRUE,
-                            pairwise = TRUE,
-                            group.study = "After",
-                            group.ref = "Before")
+results.dCt.pairwise <- RQ_dCt(data = data.dCt.pairwise,
+                               do.tests = TRUE,
+                               pairwise = TRUE,
+                               group.study = "After",
+                               group.ref = "Before")
 
 # Obtained table can be sorted by, e.g. p values from the Mann-Whitney U test:
-results <- as.data.frame(arrange(RQ.dCt.exp.pairwise[[1]], MW_test_p))
+results <- as.data.frame(arrange(results.dCt.pairwise[[1]], MW_test_p))
 head(results)
 # Access to the table with fold change values calculated individually for each pair of sampleS:
-FCh <- RQ.dCt.exp.pairwise[[2]]
+FCh <- results.dCt.pairwise[[2]]
 head(FCh)
 
 ## ----cache=FALSE--------------------------------------------------------------
-data.dCt.pairwise <- delta_Ct(data = data.Ct.pairwiseF.ready, ref = "Gene4")
+data.dCt.pairwise <- delta_Ct(data = data.Ct.pairwiseF.ready, ref = "Gene4", transform = FALSE)
 library(coin)
 # Remember to set pairwise = TRUE:
-RQ.ddCt.pairwise <- RQ_ddCt(data = data.dCt.pairwise,
+results.ddCt.pairwise <- RQ_ddCt(data = data.dCt.pairwise,
                    group.study = "After",
                    group.ref = "Before",
                    pairwise = TRUE,
                    do.tests = TRUE)
 
 # Obtained table can be sorted by, e.g. p values from the Mann-Whitney U test:
-results <- as.data.frame(arrange(RQ.ddCt.pairwise[[1]], MW_test_p))
+results <- as.data.frame(arrange(results.ddCt.pairwise[[1]], MW_test_p))
 head(results)
-# Access to the table with fold change values calculated individually for each pair of sampleS:
-FCh <- RQ.ddCt.pairwise[[2]]
+# Access to the table with fold change values calculated individually for each pair of samples:
+FCh <- results.ddCt.pairwise[[2]]
 head(FCh)
 
 ## ----fig.dim=c(7.1,6), cache=FALSE--------------------------------------------
@@ -555,7 +548,7 @@ control_boxplot_gene <- control_boxplot_gene(data = data.dCt.pairwise,
 
 ## ----fig.dim=c(7.1,6), cache=FALSE--------------------------------------------
 # Remember to set pairwise.FCh to TRUE:
-FCh <- RQ.dCt.exp.pairwise[[2]]
+FCh <- results.dCt.pairwise[[2]]
 control.boxplot.sample.pairwise <- control_boxplot_sample(data = FCh,
                                                           pairwise.FCh = TRUE,
                                                           axis.text.size = 9,
@@ -628,20 +621,20 @@ dim(data.dCt.pairwise.F)
 
 ## -----------------------------------------------------------------------------
 # Remember to set pairwise = TRUE:
-RQ.ddCt.pairwise <- RQ_ddCt(data = data.dCt.pairwise.F,
+results.ddCt.pairwise <- RQ_ddCt(data = data.dCt.pairwise.F,
                    group.study = "After",
                    group.ref = "Before",
                    pairwise = TRUE,
                    do.tests = TRUE)
 
 # Obtained table can be sorted by, e.g. p values from the Mann-Whitney U test:
-results <- as.data.frame(arrange(RQ.ddCt.pairwise[[1]], MW_test_p))
+results <- as.data.frame(arrange(results.ddCt.pairwise[[1]], MW_test_p))
 head(results)
 
 ## ----fig.dim=c(7.1,4), cache=FALSE--------------------------------------------
 library(ggsignif)
-#  Remember to use the first element of list object returned by `RQ_exp_Ct_dCt()` or RQ_ddCt() function:
-RQ.plot.pairwise <- RQ_plot(data = RQ.ddCt.pairwise[[1]],
+#  Remember to use the first element of list object returned by `RQ_dCt()` or RQ_ddCt() function:
+FCh.plot.pairwise <- FCh_plot(data = results.ddCt.pairwise[[1]],
                    use.p = TRUE,
                    mode = "depends.adj",
                    p.threshold = 0.05,
@@ -649,7 +642,7 @@ RQ.plot.pairwise <- RQ_plot(data = RQ.ddCt.pairwise[[1]],
                    FCh.threshold = 1.5,
                    angle = 20)
 # Access the table with results:
-head(as.data.frame(RQ.plot.pairwise[[2]]))
+head(as.data.frame(FCh.plot.pairwise[[2]]))
 
 ## ----fig.dim=c(7.1,4), cache=FALSE--------------------------------------------
 # Firstly prepare a vector with significance labels specified according to the user needings:
@@ -667,7 +660,7 @@ signif.labels <- c("ns.",
                    "**",
                    "***")
 # Remember to set signif.show = TRUE:
-RQ.plot.pairwise <- RQ_plot(data = RQ.ddCt.pairwise[[1]],
+FCh.plot.pairwise <- FCh_plot(data = results.ddCt.pairwise[[1]],
                    use.p = TRUE,
                    mode = "depends.adj",
                    p.threshold = 0.05,
@@ -702,7 +695,7 @@ signif.labels <- c("ns.",
                    "         ns.         ",
                    " * ",
                    "***")
-RQ.plot <- RQ_plot(data = RQ.ddCt.pairwise[[1]],
+FCh.plot <- FCh_plot(data = results.ddCt.pairwise[[1]],
                    use.p = TRUE,
                    mode = "user",
                    p.threshold = 0.05,
@@ -718,7 +711,7 @@ RQ.plot <- RQ_plot(data = RQ.ddCt.pairwise[[1]],
 # Genes with p < 0.05 and 2-fold changed expression between compared groups 
 # are considered significant. Remember to use the first element of list object 
 # returned by RQ_ddCt() function: 
-RQ.volcano.pairwise <- RQ_volcano(data = RQ.ddCt.pairwise[[1]],
+RQ.volcano.pairwise <- results_volcano(data = results.ddCt.pairwise[[1]],
                          mode = "depends.adj",
                          p.threshold = 0.05,
                          FCh.threshold = 1.5)
