@@ -13,6 +13,7 @@ results_boxplot(
   signif.labels,
   signif.length = 0.2,
   signif.dist = 0.2,
+  signif.size = 3.88,
   faceting = TRUE,
   facet.row,
   facet.col,
@@ -50,7 +51,9 @@ results_boxplot(
 
 \item{by.group}{Logical: if TRUE (default), distributions will be drawn by compared groups of samples.}
 
-\item{signif.show}{Logical: if TRUE, labels for statistical significance will be added to the plot. Default to FALSE.}
+\item{signif.show}{Logical: if TRUE, labels for statistical significance will be added to the plot (default to FALSE).
+It should be used if faceting parameter is set to TRUE. If faceting is not used, the solution to properly show
+significance labels is provide in vignette.}
 
 \item{signif.labels}{Character vector with statistical significance labels (e.g. "ns.","***", etc.). The number
 of elements must be equal to the number of genes used for plotting. All elements in the vector must be different; therefore,
@@ -60,6 +63,8 @@ symmetrically white spaces to repeated labels must be add to the same labels, e.
 
 \item{signif.dist}{Numeric: distance between the highest value and statistical significance labels.
 Can be in y axis units (if faceting = FALSE) or fraction of y axis value reached by the highest value (if faceting = TRUE).}
+
+\item{signif.size}{Numeric: size of significance labels.}
 
 \item{faceting}{Logical: if TRUE (default), plot will be drawn with facets with free scales.}
 
@@ -125,15 +130,16 @@ library(ggsignif)
 library(tidyverse)
 data(data.Ct)
 data.CtF <- filter_Ct(data.Ct,
-                      remove.Gene = c("Gene2","Gene5","Gene6","Gene9","Gene11"),
+                      remove.Gene = c("FGF23","ANGPT2","IL1A","CSF2","IL6"),
                       remove.Sample = c("Control08","Control16","Control22"))
 data.CtF.ready <- make_Ct_ready(data.CtF, imput.by.mean.within.groups = TRUE)
-data.dCt <- delta_Ct(data.CtF.ready, ref = "Gene8")
+data.dCt <- delta_Ct(data.CtF.ready, ref = "GAPDH")
 data.dCtF <- filter_transformed_data(data.dCt, remove.Sample = c("Control11"))
 results_boxplot(data.dCtF,
-                sel.Gene = c("Gene1","Gene16","Gene19","Gene20"),
-                signif.labels = c("****","*","***"," * "),
+                sel.Gene = c("ANGPT1","IL8", "VEGFB"),
+                signif.labels = c("****","**","****"),
                 angle = 30,
+                signif.show = TRUE,
                 signif.dist = 1.05,
                 facet.row = 1,
                 facet.col = 4,

@@ -12,6 +12,7 @@ results_barplot(
   signif.labels,
   signif.length = 0.2,
   signif.dist = 0.2,
+  signif.size = 3.88,
   faceting = FALSE,
   facet.row,
   facet.col,
@@ -54,6 +55,8 @@ symmetrically white spaces to repeated labels must be add to the same labels, e.
 
 \item{signif.dist}{Numeric: distance between errorbar and statistical significance labels.
 Can be in y axis units (if faceting = FALSE) or fraction of y axis value reached by errorbar (mean + sd value) (if faceting = TRUE).}
+
+\item{signif.size}{Numeric: size of significance labels.}
 
 \item{faceting}{Logical: if TRUE (default), plot will be drawn with facets with free scales.}
 
@@ -112,14 +115,15 @@ library(ggsignif)
 library(tidyverse)
 data(data.Ct)
 data.CtF <- filter_Ct(data.Ct,
-                      remove.Gene = c("Gene2","Gene5","Gene6","Gene9","Gene11"),
+                      remove.Gene = c("FGF23","ANGPT2","IL1A","CSF2","IL6"),
                       remove.Sample = c("Control08","Control16","Control22"))
 data.CtF.ready <- make_Ct_ready(data.CtF, imput.by.mean.within.groups = TRUE)
-data.dCt <- delta_Ct(data.CtF.ready, ref = "Gene8")
+data.dCt <- delta_Ct(data.CtF.ready, ref = "GAPDH")
 data.dCtF <- filter_transformed_data(data.dCt, remove.Sample = c("Control11"))
 results_barplot(data.dCtF,
-                sel.Gene = c("Gene1","Gene16","Gene19","Gene20"),
-                signif.labels = c("****","*","***"," * "),
+                sel.Gene = c("ANGPT1","IL8", "VEGFB"),
+                signif.labels = c("****","**","***"),
+                signif.show = TRUE,
                 angle = 30,
                 signif.dist = 1.05,
                 facet.row = 1,

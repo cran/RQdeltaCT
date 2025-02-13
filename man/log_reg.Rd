@@ -12,6 +12,8 @@ log_reg(
   increment,
   centerline = 1,
   ci = 0.95,
+  p.adjust = FALSE,
+  p.adjust.method = "BH",
   log.axis = FALSE,
   x.axis.title = "Odds ratio",
   y.axis.title = "",
@@ -50,6 +52,11 @@ calculated for the situation where gene expression increases by mean of gene exp
 \item{centerline}{Numeric: position of vertical centerline on the plot. Default to 1.}
 
 \item{ci}{Numeric: confidence level used for computation of confidence interval. Default to 0.95.}
+
+\item{p.adjust}{Logical: if TRUE, p values adjusted using a method provided in p.adjust.method parameter will be shown on the plot. Default to FALSE.}
+
+\item{p.adjust.method}{Character: p value correction method for multiple testing, one of the "holm", "hochberg", "hommel",
+"bonferroni", "BH" (default), "BY","fdr", or "none". See documentation for stats::p.adjust() function for details.}
 
 \item{log.axis}{Logical: if TRUE, axis with odds ratio values will be in log10 scale. Default to FALSE.}
 
@@ -99,14 +106,14 @@ library(tidyverse)
 library(oddsratio)
 data(data.Ct)
 data.CtF <- filter_Ct(data.Ct,
-                      remove.Gene = c("Gene2","Gene5","Gene6","Gene9","Gene11"),
+                      remove.Gene = c("FGF23","ANGPT2","IL1A","CSF2","IL6"),
                        remove.Sample = c("Control08","Control16","Control22"))
 data.CtF.ready <- make_Ct_ready(data.CtF, imput.by.mean.within.groups = TRUE)
 data.dCt <- delta_Ct(data.CtF.ready,
-                     ref = "Gene8")
+                     ref = "GAPDH")
 log.reg.results <- log_reg(data.dCt,
-                           sel.Gene = c("Gene1","Gene16","Gene19","Gene20"),
-                           group.study = "Disease",
+                           sel.Gene = c("ANGPT1","IL8", "VEGFB"),
+                           group.study = "AAA",
                            group.ref = "Control",
                            increment = 1)
 

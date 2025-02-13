@@ -18,6 +18,7 @@ FCh_plot(
   signif.labels,
   signif.length = 0.2,
   signif.dist = 0.5,
+  signif.size = 3.88,
   y.exp.low = 0.1,
   y.exp.up = 0.1,
   angle = 0,
@@ -81,6 +82,8 @@ symmetrically white spaces to repeated labels must be add to the same labels, e.
 
 \item{signif.dist}{Numeric: distance between errorbar and statistical significance labels.}
 
+\item{signif.size}{Numeric: size of significance labels.}
+
 \item{y.exp.low, y.exp.up}{Numeric: space between data on the plot and lower or upper axis. Useful to add extra space for statistical significance labels when faceting = TRUE.}
 
 \item{angle}{Integer: value of angle in which names of genes are displayed. Default to 0.}
@@ -133,12 +136,12 @@ library(ggsignif)
 library(tidyverse)
 data(data.Ct)
 data.CtF <- filter_Ct(data.Ct,
-                      remove.Gene = c("Gene2","Gene5","Gene6","Gene9","Gene11"),
+                      remove.Gene = c("FGF23","ANGPT2","IL1A","CSF2","IL6"),
                       remove.Sample = c("Control08","Control16","Control22"))
 data.CtF.ready <- make_Ct_ready(data.CtF, imput.by.mean.within.groups = TRUE)
-data.dCt <- delta_Ct(data.CtF.ready, ref = "Gene8")
+data.dCt <- delta_Ct(data.CtF.ready, ref = "GAPDH")
 data.dCtF <- filter_transformed_data(data.dCt, remove.Sample = c("Control11"))
-results.ddCt <- RQ_ddCt(data.dCtF, "Disease", "Control")
+results.ddCt <- RQ_ddCt(data.dCtF, "AAA", "Control")
 
 signif.labels <- c("****",
                    "**",
@@ -158,6 +161,7 @@ FCh.plot <- FCh_plot(results.ddCt,
                    mode = "depends",
                    use.FCh = TRUE,
                    FCh.threshold = 2.5,
+                   signif.show = TRUE,
                    signif.labels = signif.labels,
                    angle = 30)
 head(FCh.plot[[2]])
@@ -172,6 +176,7 @@ FCh.plot <- FCh_plot(results.ddCt,
                    mode = "user",
                    use.FCh = TRUE,
                    FCh.threshold = 2,
+                   signif.show = TRUE,
                    signif.labels = signif.labels,
                    angle = 30)
 head(FCh.plot[[2]])

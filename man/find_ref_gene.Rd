@@ -27,7 +27,9 @@ find_ref_gene(
   dpi = 600,
   width = 15,
   height = 15,
-  name.tiff = "Ct_reference_gene_selection"
+  name.tiff = "Ct_reference_gene_selection",
+  save.to.txt = FALSE,
+  name.txt = "reference_gene_selection"
 )
 }
 \arguments{
@@ -77,6 +79,10 @@ See description for legend.position in ggplot2::theme() function.}
 \item{height}{Numeric: height (in cm) of saved .tiff file. Default to 15.}
 
 \item{name.tiff}{Character: name of saved .tiff file, without ".tiff" name of extension. Default to "Ct_reference_gene_selection".}
+
+\item{save.to.txt}{Logical: if TRUE, returned data will be saved to .txt file. Default to FALSE.}
+
+\item{name.txt}{Character: name of saved .txt file, without ".txt" name of extension. Default to "ref_gene_results".}
 }
 \value{
 List containing an object with plot and a table with calculated parameters. Created plot is also displayed on the graphic device.
@@ -91,12 +97,12 @@ library(ctrlGene)
 library(tidyverse)
 data(data.Ct)
 data.CtF <- filter_Ct(data.Ct,
-                       remove.Gene = c("Gene2","Gene5","Gene6","Gene9","Gene11"),
+                       remove.Gene = c("FGF23","ANGPT2","IL1A","CSF2","IL6"),
                        remove.Sample = c("Control08","Control16","Control22"))
 data.CtF.ready <- make_Ct_ready(data.CtF, imput.by.mean.within.groups = TRUE)
 ref <- find_ref_gene(data.CtF.ready,
-                     groups = c("Disease","Control"),
-                     candidates = c("Gene4", "Gene8","Gene10","Gene16","Gene17", "Gene18"),
+                     groups = c("AAA","Control"),
+                     candidates = c("CCL5", "IL1B","GAPDH","TGFB","TNF", "VEGFA"),
                      col = c("#66c2a5", "#fc8d62","#6A6599", "#D62728", "#1F77B4", "black"),
                      norm.finder.score = TRUE,
                      genorm.score = TRUE)
