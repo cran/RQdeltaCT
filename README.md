@@ -1,7 +1,15 @@
 
 ### RQdeltaCT - an R package for relative quantification of gene expression using delta Ct methods 
 
-**Version 1.3.2 with various improvements in the code and extended vignette is finally released!**
+---
+
+An article presenting `RQdeltaCT` package has been published! If you use our package in your work, please cite this related article:
+
+* **Zalewski, D., Bogucka-Kocka, A. RQdeltaCT: an open-source R package for relative quantification of gene expression using delta Ct methods. Sci Rep 15, 29762 (2025). https://doi.org/10.1038/s41598-025-11822-0**
+
+Version 1.3.3 with citation information will be released soon.
+
+---
 
 `RQdeltaCT` is an R package developed to perform relative quantification of gene expression using delta Ct family methods (encompassing 2^-dCt, and 2^-ddCt method), originally proposed by Kenneth J. Livak and Thomas D. Schmittgen in [Article1](https://doi.org/10.1006/meth.2001.1262) and [Article2](https://www.nature.com/articles/nprot.2008.73).  
 
